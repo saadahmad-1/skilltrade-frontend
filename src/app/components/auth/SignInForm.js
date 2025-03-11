@@ -55,7 +55,7 @@ const SignInForm = () => {
 
                 <div className="text-center mt-6">
                     <p className="text-white text-lg">
-                        Don't have an account? {' '}
+                        Don&apos;t have an account? {' '}
                         <Link href="/auth/sign-up" className="text-white hover:underline">
                             Sign up
                         </Link>
