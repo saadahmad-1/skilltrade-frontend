@@ -14,6 +14,7 @@ const SignUpForm = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,98 +25,91 @@ const SignUpForm = () => {
         }
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const { user } = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(user, { displayName: fullName });
 
-            await updateProfile(userCredential.user, {
-                displayName: fullName
+            const token = await user.getIdToken();
+
+            await fetch(`${API_URL}/api/user/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ fullName, email }),
             });
-
-            // // Send user info to your backend/MongoDB here
-            // await fetch('/api/users', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({
-            //         uid: user.uid,
-            //         email: user.email,
-            //         fullName,
-            //     }),
-            // });
 
             router.push('/');
         } catch (err) {
+            console.error(err);
             setError(err.message);
         }
     };
 
     return (
         <div className="w-full max-w-md">
-            <div className="text-center mb-8">
-                <h1 className="text-white text-6xl font-bold mb-4">Welcome</h1>
-                <p className="text-gray-400 text-2xl">Enter your details to sign up</p>
+            <div className="text-center mb-6">
+                <h1 className="text-white text-4xl font-bold mb-2">Welcome</h1>
+                <p className="text-gray-400 text-lg">Enter your details to sign up</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {error && <p className="text-red-500 text-center">{error}</p>}
-                <div>
-                    <input
-                        type="text"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Full name"
-                        className="w-full py-5 px-4 rounded-full bg-neutral-900 text-white text-xl focus:outline-none"
-                        required
-                    />
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-3">
+                {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+                <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Full name"
+                    className="w-full py-3 px-4 rounded-full bg-neutral-900 text-white text-base focus:outline-none"
+                    required
+                />
 
-                <div>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Email address"
-                        className="w-full py-5 px-4 rounded-full bg-neutral-900 text-white text-xl focus:outline-none"
-                        required
-                    />
-                </div>
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address"
+                    className="w-full py-3 px-4 rounded-full bg-neutral-900 text-white text-base focus:outline-none"
+                    required
+                />
 
-                <div>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        className="w-full py-5 px-4 rounded-full bg-neutral-900 text-white text-xl focus:outline-none"
-                    />
-                </div>
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full py-3 px-4 rounded-full bg-neutral-900 text-white text-base focus:outline-none"
+                    required
+                />
 
-                <div>
-                    <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm password"
-                        className="w-full py-5 px-4 rounded-full bg-neutral-900 text-white text-xl focus:outline-none"
-                    />
-                </div>
+                <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm password"
+                    className="w-full py-3 px-4 rounded-full bg-neutral-900 text-white text-base focus:outline-none"
+                    required
+                />
 
                 <button
                     type="submit"
-                    className="w-full py-5 px-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-xl font-medium transition-colors"
+                    className="w-full py-3 px-4 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-base font-medium transition-colors"
                 >
                     Sign up
                 </button>
 
-                <div className="text-center mt-6">
-                    <p className="text-white text-lg">
+                <div className="text-center mt-4">
+                    <p className="text-white text-base">
                         Already have an account?{' '}
-                        <Link href="/auth/sign-in" className="text-white hover:underline">
+                        <Link href="/auth/sign-in" className="text-indigo-400 hover:underline">
                             Log in
                         </Link>
                     </p>
                 </div>
             </form>
-            <div className="mt-6 flex items-center justify-center text-center w-full">
-                <GoogleSignIn />
+
+            <div className="mt-4 flex items-center justify-center">
+                <GoogleSignIn className="w-full py-3 px-4 text-base rounded-full" />
             </div>
         </div>
     );

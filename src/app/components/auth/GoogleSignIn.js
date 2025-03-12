@@ -9,21 +9,33 @@ const provider = new GoogleAuthProvider();
 export default function GoogleSignIn() {
 
     const router = useRouter();
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-    const handleGoogleLogin = async () => {
+    const handleGoogleSignIn = async () => {
+        const provider = new GoogleAuthProvider();
+
         try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            console.log('Google User:', user);
+            const { user } = await signInWithPopup(auth, provider);
+            const token = await user.getIdToken();
+
+            await fetch(`${API_URL}/api/user/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ fullName: user.displayName, email: user.email }),
+            });
+
             router.push('/');
-        } catch (error) {
-            console.error('Google Sign-in Error:', error);
+        } catch (err) {
+            console.error(err);
         }
     };
 
     return (
         <button
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleSignIn}
             className="flex items-center gap-3 bg-[#181818] text-white px-6 py-3 rounded-full hover:bg-[#222222] transition duration-200 font-medium"
         >
             <Image
