@@ -2,16 +2,49 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
+import GoogleSignIn from './GoogleSignIn';
 
 const SignUpForm = () => {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const router = useRouter();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle form submission
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+            await updateProfile(userCredential.user, {
+                displayName: fullName
+            });
+
+            // // Send user info to your backend/MongoDB here
+            // await fetch('/api/users', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         uid: user.uid,
+            //         email: user.email,
+            //         fullName,
+            //     }),
+            // });
+
+            router.push('/');
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     return (
@@ -22,6 +55,7 @@ const SignUpForm = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+                {error && <p className="text-red-500 text-center">{error}</p>}
                 <div>
                     <input
                         type="text"
@@ -29,6 +63,7 @@ const SignUpForm = () => {
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Full name"
                         className="w-full py-5 px-4 rounded-full bg-neutral-900 text-white text-xl focus:outline-none"
+                        required
                     />
                 </div>
 
@@ -39,6 +74,7 @@ const SignUpForm = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Email address"
                         className="w-full py-5 px-4 rounded-full bg-neutral-900 text-white text-xl focus:outline-none"
+                        required
                     />
                 </div>
 
@@ -71,13 +107,16 @@ const SignUpForm = () => {
 
                 <div className="text-center mt-6">
                     <p className="text-white text-lg">
-                        Already have an account? {' '}
-                        <Link href="/signin" className="text-white hover:underline">
+                        Already have an account?{' '}
+                        <Link href="/auth/sign-in" className="text-white hover:underline">
                             Log in
                         </Link>
                     </p>
                 </div>
             </form>
+            <div className="mt-6 flex items-center justify-center text-center w-full">
+                <GoogleSignIn />
+            </div>
         </div>
     );
 };
