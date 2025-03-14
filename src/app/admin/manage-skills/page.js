@@ -39,7 +39,7 @@ export default function AdminManageSkills() {
 
     return (
         <div className="max-w-lg mx-auto p-6 bg-neutral-900 rounded-2xl shadow-lg text-white">
-            <h2 className="text-2xl font-semibold text-center mb-4">Manage Skills</h2>
+            <h2 className="text-2xl font-semibold text-center mb-4">Manage Tradable Skills</h2>
 
             {/* Add Skill Input */}
             <div className="flex gap-2 mb-4">
