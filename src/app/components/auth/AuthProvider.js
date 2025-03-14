@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
                     uid: user.uid,
                     email: user.email,
                     displayName: user.displayName,
+                    isActive: user.isActive,
                 }));
             } else {
                 dispatch(clearUser());

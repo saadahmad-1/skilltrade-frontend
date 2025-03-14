@@ -21,7 +21,7 @@ const SignInForm = () => {
             const { user } = await signInWithEmailAndPassword(auth, email, password);
             const token = await user.getIdToken();
 
-            await fetch(`${API_URL}/api/user/register`, {
+            const response = await fetch(`${API_URL}/api/user/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,8 +29,9 @@ const SignInForm = () => {
                 },
                 body: JSON.stringify({ fullName: user.displayName || '', email }),
             });
-
-            router.push('/');
+            if (response.status === 401) { setError('User is NOT ACTIVE'); return; }
+            if (response.ok)
+                router.push('/dashboard');
         } catch (err) {
             console.error(err);
             setError(err.message);
