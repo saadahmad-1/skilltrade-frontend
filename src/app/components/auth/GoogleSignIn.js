@@ -27,7 +27,7 @@ export default function GoogleSignIn() {
                 body: JSON.stringify({ fullName: user.displayName, email: user.email }),
             });
 
-            router.push('/');
+            router.push('/dashboard');
         } catch (err) {
             console.error(err);
         }

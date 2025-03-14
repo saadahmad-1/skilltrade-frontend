@@ -39,7 +39,7 @@ const SignUpForm = () => {
                 body: JSON.stringify({ fullName, email }),
             });
 
-            router.push('/');
+            router.push('/dashboard');
         } catch (err) {
             console.error(err);
             setError(err.message);

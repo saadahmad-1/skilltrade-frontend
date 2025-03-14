@@ -40,7 +40,11 @@ const Navbar = () => {
                         Skill<span className="text-indigo-500">Trade</span>
                     </Link>
                 </div>
-
+                <div>
+                    <Link href="/admin" className="text-white hover:text-indigo-500 transition-colors">
+                        Admin
+                    </Link>
+                </div>
                 <div className="relative">
                     <button
                         onClick={toggleMenu}
@@ -59,13 +63,13 @@ const Navbar = () => {
                         <div className="absolute right-0 top-14 w-48 bg-neutral-800/95 backdrop-blur-sm shadow-lg rounded-xl overflow-hidden border border-neutral-700 transform transition-all duration-200 z-50">
                             <button
                                 onClick={() => {
-                                    router.push('/new-skill');
+                                    router.push('/dashboard/new-trade');
                                     setIsMenuOpen(false);
                                 }}
                                 className="flex items-center px-4 py-3 w-full hover:bg-indigo-500/20 text-white"
                             >
                                 <PlusCircle className="mr-2" />
-                                New Skill
+                                New Trade
                             </button>
                             <button
                                 onClick={() => {
