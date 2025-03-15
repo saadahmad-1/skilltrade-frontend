@@ -14,18 +14,7 @@ export default function NewTrade() {
   const loading = useSelector(selectLoading);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/auth/sign-in');
-    }
-  }, [user, loading]);
-
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <Spin size="large" />
-    </div>
-  );
-
+  // Ensure hooks are always called at the top level
   const [skills, setSkills] = useState([]);
   const [selectedHaveSkills, setSelectedHaveSkills] = useState([]);
   const [selectedWantSkills, setSelectedWantSkills] = useState([]);
@@ -33,6 +22,12 @@ export default function NewTrade() {
   const [searchWant, setSearchWant] = useState("");
   const [filteredHaveSkills, setFilteredHaveSkills] = useState([]);
   const [filteredWantSkills, setFilteredWantSkills] = useState([]);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/sign-in');
+    }
+  }, [user, loading, router]); // Ensure `router` is also included in the dependency array
 
   useEffect(() => {
     fetch(`${API_URL}/api/skill`)
@@ -46,26 +41,32 @@ export default function NewTrade() {
   }, []);
 
   useEffect(() => {
-    if (searchHave) {
-      const filtered = skills.filter(skill =>
-        skill.name.toLowerCase().includes(searchHave.toLowerCase())
-      );
-      setFilteredHaveSkills(filtered);
-    } else {
-      setFilteredHaveSkills(skills);
-    }
+    setFilteredHaveSkills(
+      searchHave
+        ? skills.filter(skill =>
+          skill.name.toLowerCase().includes(searchHave.toLowerCase())
+        )
+        : skills
+    );
   }, [searchHave, skills]);
 
   useEffect(() => {
-    if (searchWant) {
-      const filtered = skills.filter(skill =>
-        skill.name.toLowerCase().includes(searchWant.toLowerCase())
-      );
-      setFilteredWantSkills(filtered);
-    } else {
-      setFilteredWantSkills(skills);
-    }
+    setFilteredWantSkills(
+      searchWant
+        ? skills.filter(skill =>
+          skill.name.toLowerCase().includes(searchWant.toLowerCase())
+        )
+        : skills
+    );
   }, [searchWant, skills]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   const addSkill = (skill, type) => {
     if (type === "have" && !selectedHaveSkills.some((s) => s._id === skill._id)) {
@@ -128,15 +129,20 @@ export default function NewTrade() {
     return <span className="inline-flex items-center justify-center mr-2">{icon}</span>;
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async () => {
     await fetch(`${API_URL}/api/trade`, {
       method: "POST",
       headers: {
-        "Content-Type": "application json",
-      }
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        haveSkills: selectedHaveSkills,
+        wantSkills: selectedWantSkills
+      })
     });
+
     router.push('/dashboard/trades');
-  }
+  };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center py-12 px-4">
@@ -233,12 +239,9 @@ export default function NewTrade() {
 
         <div className="mt-12 flex justify-center">
           <button
-            onClick={() => onSubmit({
-              haveSkills: selectedHaveSkills,
-              wantSkills: selectedWantSkills
-            })}
+            onClick={onSubmit}
             disabled={selectedHaveSkills.length === 0 || selectedWantSkills.length === 0}
-            className={`px-10 py-5 bg-indigo-500 hover:bg-indigo-600 text-white text-xl font-medium rounded-full transition-colors shadow-lg ${(selectedHaveSkills.length === 0 || selectedWantSkills.length === 0)
+            className={`px-10 py-5 bg-indigo-500 hover:bg-indigo-600 text-white text-xl font-medium rounded-full transition-colors shadow-lg ${selectedHaveSkills.length === 0 || selectedWantSkills.length === 0
               ? 'opacity-50 cursor-not-allowed'
               : 'hover:shadow-xl transform hover:-translate-y-1'
               }`}
