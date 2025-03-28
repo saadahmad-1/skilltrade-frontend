@@ -70,11 +70,30 @@ export default function Dashboard() {
     }
   }, [matches]);
 
+  const handleAcceptMatch = () => {
+    fetch(`${API_URL}/api/trade/accept`, {
+      method: 'POST',
+      body: JSON.stringify({
+        tradeId: matches[0]._id,
+        userId: user.uid,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(router.push('/'))
+    .catch(err => console.error("Error accepting match:", err));
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-black">
       <Spin size="large" />
     </div>
   );
+  
+  console.log("TRADE", trade);
+  console.log("MATCHES", matches);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col justify-center items-center px-4">
@@ -106,6 +125,22 @@ export default function Dashboard() {
                       <h2 className="text-2xl font-semibold mb-3 text-blue-400">{userName}</h2>
                       <p className="text-gray-300">Has: <span className="text-white">{haveSkill?.name}</span></p>
                       <p className="text-gray-300">Wants: <span className="text-white">{wantSkill?.name}</span></p>
+                      {matches[0]?.acceptedBy && trade && trade[0]?.acceptedBy ? (
+                        <p className="text-gray-300 mt-6">
+                          <span className="text-green-500 font-bold">Continue to Chat</span>
+                        </p>
+                      ) : matches[0]?.acceptedBy ? (
+                        <p className="text-gray-300 mt-6">
+                          <span className="text-green-500 font-bold">Trade Already Accepted</span>
+                        </p>
+                      ) : (
+                        <button
+                          onClick={handleAcceptMatch}
+                          className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full flex items-center space-x-2 mb-4"
+                        >
+                          <span>Accept Match</span>
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
