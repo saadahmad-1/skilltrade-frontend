@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { auth } from '../../../lib/firebase';
-import { clearUser, selectUser } from '../../../redux/features/authSlice';
+import { auth } from '../../lib/firebase';
+import { clearUser, selectUser } from '../../redux/features/authSlice';
 import { signOut } from 'firebase/auth';
 import { useRouter, usePathname } from 'next/navigation';
 import { UserCircle2, LogOut, ChevronDown, ChevronUp, PlusCircle } from 'lucide-react';
