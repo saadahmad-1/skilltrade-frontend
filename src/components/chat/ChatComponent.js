@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/redux/features/authSlice';
-import { db } from '@/lib/firebase'; // Update with your actual path
+import { db } from '@/lib/firebase';
 import {
   collection,
   addDoc,

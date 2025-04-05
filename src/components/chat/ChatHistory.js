@@ -46,7 +46,7 @@ export default function ChatHistory() {
           // Find the other participant
           const otherUserId = chatData.participants.find(id => id !== user.uid);
 
-          // Get other user details from your API
+          // Get other user details from API
           let otherUserName = 'Unknown User';
           try {
             const response = await fetch(`${API_URL}/api/user/${otherUserId}`);
