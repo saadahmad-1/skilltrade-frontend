@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Spin } from 'antd';
 import { HandshakeIcon, PlusCircleIcon, BookOpenIcon, MessageCircleIcon } from 'lucide-react';
-import ChatComponent from '@/components/chat/ChatComponent'; // Update with your actual path
+import ChatComponent from '@/components/chat/ChatComponent';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -14,13 +14,12 @@ export default function Dashboard() {
   const user = useSelector(selectUser);
   const loading = useSelector(selectLoading);
   const router = useRouter();
+
   const [trade, setTrade] = useState(null);
   const [matches, setMatches] = useState([]);
-  const [wantSkill, setWantSkill] = useState(null);
-  const [haveSkill, setHaveSkill] = useState(null);
-  const [userName, setUserName] = useState(null);
   const [showChat, setShowChat] = useState(false);
-  const [matchUserId, setMatchUserId] = useState(null);
+  const [chatUserId, setChatUserId] = useState(null);
+  const [chatUserName, setChatUserName] = useState(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -28,6 +27,7 @@ export default function Dashboard() {
     }
   }, [user, loading, router]);
 
+  // Get user's current trade
   useEffect(() => {
     if (user) {
       fetch(`${API_URL}/api/trade/user/${user.uid}`)
@@ -37,82 +37,61 @@ export default function Dashboard() {
     }
   }, [user]);
 
+  // Get unaccepted matches and enrich them
   useEffect(() => {
     if (user) {
-      console.log("Fetching matches for user:", user.uid);
       fetch(`${API_URL}/api/trade/matches/${user.uid}`)
         .then(res => res.json())
-        .then(data => {
-          console.log("Matches data received:", data);
-          setMatches(data);
-          if (data.length > 0) {
-            console.log("Setting match user ID:", data[0].user);
-            setMatchUserId(data[0].user);
-          }
+        .then(async (data) => {
+          const enriched = await Promise.all(data.map(async (match) => {
+            const [haveSkill, wantSkill, userInfo] = await Promise.all([
+              fetch(`${API_URL}/api/skill/${match.haveSkill}`).then(res => res.json()),
+              fetch(`${API_URL}/api/skill/${match.wantSkill}`).then(res => res.json()),
+              fetch(`${API_URL}/api/user/${match.user}`).then(res => res.json())
+            ]);
+            return {
+              ...match,
+              haveSkill,
+              wantSkill,
+              userName: userInfo.fullName
+            };
+          }));
+          setMatches(enriched);
         })
         .catch(err => console.error("Error fetching matches:", err));
     }
   }, [user]);
 
-  useEffect(() => {
-    if (matches.length > 0) {
-      fetch(`${API_URL}/api/skill/${matches[0].haveSkill}`)
-        .then(res => res.json())
-        .then(setHaveSkill)
-        .catch(err => console.error("Error fetching have skill:", err));
-    }
-  }, [matches]);
-
-  useEffect(() => {
-    if (matches.length > 0) {
-      fetch(`${API_URL}/api/skill/${matches[0].wantSkill}`)
-        .then(res => res.json())
-        .then(setWantSkill)
-        .catch(err => console.error("Error fetching want skill:", err));
-    }
-  }, [matches]);
-
-  useEffect(() => {
-    if (matches.length > 0) {
-      fetch(`${API_URL}/api/user/${matches[0].user}`)
-        .then(res => res.json())
-        .then(data => setUserName(data.fullName))
-        .catch(err => console.error("Error fetching user:", err));
-    }
-  }, [matches]);
-
-  const handleAcceptMatch = () => {
+  const handleAcceptMatch = (matchId) => {
     fetch(`${API_URL}/api/trade/accept`, {
       method: 'POST',
       body: JSON.stringify({
-        tradeId: matches[0]._id,
+        tradeId: matchId,
         userId: user.uid,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
-    .then(res => res.json())
-    .then(() => {
-      // Refresh the trade data after accepting
-      fetch(`${API_URL}/api/trade/user/${user.uid}`)
-        .then(res => res.json())
-        .then(setTrade)
-        .catch(err => console.error("Error fetching trade for user:", err));
-    })
-    .catch(err => console.error("Error accepting match:", err));
+      .then(res => res.json())
+      .then(() => {
+        // Refresh trade and matches after accepting
+        fetch(`${API_URL}/api/trade/user/${user.uid}`)
+          .then(res => res.json())
+          .then(setTrade);
+
+        fetch(`${API_URL}/api/trade/matches/${user.uid}`)
+          .then(res => res.json())
+          .then(setMatches);
+      })
+      .catch(err => console.error("Error accepting match:", err));
   };
 
-  const handleStartChat = () => {
-    console.log("Starting chat with user ID:", matchUserId);
+  const handleStartChat = (match) => {
+    setChatUserId(match.user);
+    setChatUserName(match.userName);
     setShowChat(true);
   };
-
-  useEffect(() => {
-    if (showChat && matchUserId) {
-      console.log("Chat component should be showing with matchUserId:", matchUserId);
-    }
-  }, [showChat, matchUserId]);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-black">
@@ -123,10 +102,10 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col justify-center items-center px-4">
       <main className="w-full max-w-2xl">
-        {showChat && matchUserId ? (
+        {showChat && chatUserId ? (
           <ChatComponent 
-            matchUserId={matchUserId} 
-            matchUserName={userName || "Trading Partner"} 
+            matchUserId={chatUserId} 
+            matchUserName={chatUserName || "Trading Partner"} 
             onBack={() => setShowChat(false)}
           />
         ) : (
@@ -154,24 +133,25 @@ export default function Dashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {matches.map(match => (
                       <div key={match._id} className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-                        <h2 className="text-2xl font-semibold mb-3 text-blue-400">{userName}</h2>
-                        <p className="text-gray-300">Has: <span className="text-white">{haveSkill?.name}</span></p>
-                        <p className="text-gray-300">Wants: <span className="text-white">{wantSkill?.name}</span></p>
-                        {match?.acceptedBy && trade && trade[0]?.acceptedBy ? (
+                        <h2 className="text-2xl font-semibold mb-3 text-blue-400">{match.userName}</h2>
+                        <p className="text-gray-300">Has: <span className="text-white">{match.haveSkill?.name}</span></p>
+                        <p className="text-gray-300">Wants: <span className="text-white">{match.wantSkill?.name}</span></p>
+
+                        {match.acceptedBy && trade[0]?.acceptedBy ? (
                           <button
-                            onClick={handleStartChat}
+                            onClick={() => handleStartChat(match)}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full"
                           >
                             <MessageCircleIcon className="w-5 h-5" />
                             <span>Continue to Chat</span>
                           </button>
-                        ) : match?.acceptedBy ? (
+                        ) : match.acceptedBy ? (
                           <p className="text-gray-300 mt-6">
                             <span className="text-green-500 font-bold">Trade Already Accepted</span>
                           </p>
                         ) : (
                           <button
-                            onClick={handleAcceptMatch}
+                            onClick={() => handleAcceptMatch(match._id)}
                             className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full"
                           >
                             <span>Accept Match</span>
@@ -187,7 +167,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <>
-                  <p className="text-center text-gray-400">No matching trades found.</p>
+                    <p className="text-center text-gray-400">No matching trades found.</p>
                     <div className="text-center">
                       <div className="mb-6 flex justify-center">
                         <BookOpenIcon className="w-16 h-16 text-green-500" />
@@ -208,8 +188,7 @@ export default function Dashboard() {
                 )}
               </div>
             ) : (
-              <>
-              </>
+              <></>
             )}
           </div>
         )}
