@@ -103,8 +103,8 @@ export default function ChatHistory() {
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-4">
         <div className="max-w-2xl mx-auto">
           <ChatComponent
-            matchUserId={selectedChat.otherUserId}
-            matchUserName={selectedChat.otherUserName}
+            matchUserId={selectedChat?.otherUserId}
+            matchUserName={selectedChat?.otherUserName}
             onBack={() => setSelectedChat(null)}
           />
         </div>
@@ -150,18 +150,18 @@ export default function ChatHistory() {
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
                     <span className="text-xl font-bold text-white">
-                      {chat.otherUserName.charAt(0).toUpperCase()}
+                      {chat?.otherUserName?.charAt(0)?.toUpperCase()}
                     </span>
                   </div>
                   <div className="ml-4">
-                    <h3 className="font-semibold">{chat.otherUserName}</h3>
+                    <h3 className="font-semibold">{chat?.otherUserName}</h3>
                     <p className="text-gray-400 text-sm truncate max-w-sm">
-                      {chat.lastMessage}
+                      {chat?.lastMessage}
                     </p>
                   </div>
                   <div className="ml-auto text-right">
                     <span className="text-xs text-gray-500">
-                      {chat.timestamp.toLocaleDateString([], {
+                      {chat?.timestamp?.toLocaleDateString([], {
                         month: 'short',
                         day: 'numeric'
                       })}

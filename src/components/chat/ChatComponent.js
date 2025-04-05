@@ -238,18 +238,18 @@ export default function ChatComponent({ matchUserId, matchUserName, onBack }) {
               className={`flex ${msg.senderId === user.uid ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] p-3 rounded-lg ${msg.senderId === user.uid
+                className={`max-w-[80%] p-3 rounded-lg ${msg?.senderId === user?.uid
                   ? 'bg-blue-600 text-white rounded-br-none'
                   : 'bg-gray-800 text-white rounded-bl-none'
                   }`}
               >
-                {msg.text.startsWith('Join the video call: ') ? (
-                  <a href={msg.text.replace('Join the video call: ', '')} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">Video Call</a>
+                {msg?.text?.startsWith('Join the video call: ') ? (
+                  <a href={msg?.text?.replace('Join the video call: ', '')} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">Video Call</a>
                 ) : (
-                  <p className="text-sm">{msg.text}</p>
+                  <p className="text-sm">{msg?.text}</p>
                 )}
                 <p className="text-xs opacity-70 mt-1">
-                  {msg.timestamp instanceof Date ? msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sending...'}
+                  {msg?.timestamp instanceof Date ? msg?.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Sending...'}
                 </p>
               </div>
             </div>
