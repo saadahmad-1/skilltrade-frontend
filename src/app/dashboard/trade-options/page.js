@@ -57,8 +57,8 @@ export default function TradeOptions() {
                     {matches.map(match => (
                         <div key={match._id} className="bg-neutral-800 p-6 rounded-lg shadow-lg">
                             <h2 className="text-2xl font-semibold mb-3">{userName}</h2>
-                            <p>Has: {haveSkill.name}</p>
-                            <p>Wants: {wantSkill.name}</p>
+                            <p>Has: {haveSkill?.name}</p>
+                            <p>Wants: {wantSkill?.name}</p>
                         </div>
                     ))}
                 </div>

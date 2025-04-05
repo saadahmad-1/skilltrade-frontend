@@ -141,11 +141,11 @@ export default function Dashboard() {
                 <div className="grid grid-cols-2 gap-4 mt-6">
                   <div className="bg-gray-800 p-4 rounded-xl shadow-md">
                     <h3 className="text-xl font-semibold text-gray-300 mb-2">Have Skill</h3>
-                    <p className="text-white text-lg">{trade[0].haveSkill.name}</p>
+                    <p className="text-white text-lg">{trade[0]?.haveSkill?.name}</p>
                   </div>
                   <div className="bg-gray-800 p-4 rounded-xl shadow-md">
                     <h3 className="text-xl font-semibold text-gray-300 mb-2">Want Skill</h3>
-                    <p className="text-white text-lg">{trade[0].wantSkill.name}</p>
+                    <p className="text-white text-lg">{trade[0]?.wantSkill?.name}</p>
                   </div>
                 </div>
 
@@ -186,26 +186,30 @@ export default function Dashboard() {
                     </div>
                   </div>
                 ) : (
+                  <>
                   <p className="text-center text-gray-400">No matching trades found.</p>
+                    <div className="text-center">
+                      <div className="mb-6 flex justify-center">
+                        <BookOpenIcon className="w-16 h-16 text-green-500" />
+                      </div>
+                      <h2 className="text-3xl font-bold mb-4">Start Your Skill Exchange</h2>
+                      <p className="text-gray-400 mb-6">
+                        Connect with others, share your expertise, and learn something new. Every skill exchange is an opportunity for growth.
+                      </p>
+                      <button
+                        onClick={() => router.push('/dashboard/new-trade')}
+                        className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold flex items-center space-x-2 mx-auto transition-transform transform hover:scale-105 shadow-lg"
+                      >
+                        <PlusCircleIcon className="w-6 h-6" />
+                        <span>Create Your First Trade</span>
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             ) : (
-              <div className="text-center">
-                <div className="mb-6 flex justify-center">
-                  <BookOpenIcon className="w-16 h-16 text-green-500" />
-                </div>
-                <h2 className="text-3xl font-bold mb-4">Start Your Skill Exchange</h2>
-                <p className="text-gray-400 mb-6">
-                  Connect with others, share your expertise, and learn something new. Every skill exchange is an opportunity for growth.
-                </p>
-                <button
-                  onClick={() => router.push('/dashboard/new-trade')}
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold flex items-center space-x-2 mx-auto transition-transform transform hover:scale-105 shadow-lg"
-                >
-                  <PlusCircleIcon className="w-6 h-6" />
-                  <span>Create Your First Trade</span>
-                </button>
-              </div>
+              <>
+              </>
             )}
           </div>
         )}

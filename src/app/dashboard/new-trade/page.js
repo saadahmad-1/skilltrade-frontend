@@ -103,7 +103,7 @@ export default function NewTrade() {
                   onClick={() => selectSkill(skill, "have")}
                   className={`px-5 py-3 rounded-full text-white transition-colors ${selectedHaveSkill?._id === skill._id ? "bg-indigo-500" : "bg-neutral-800 hover:bg-neutral-700"}`}
                 >
-                  {skill.name}
+                  {skill?.name}
                 </button>
               ))}
             </div>
@@ -118,7 +118,7 @@ export default function NewTrade() {
                   onClick={() => selectSkill(skill, "want")}
                   className={`px-5 py-3 rounded-full text-white transition-colors ${selectedWantSkill?._id === skill._id ? "bg-indigo-500" : "bg-neutral-800 hover:bg-neutral-700"}`}
                 >
-                  {skill.name}
+                  {skill?.name}
                 </button>
               ))}
             </div>
