@@ -64,7 +64,6 @@ export default function ChatHistory() {
               messagesRef,
               where('chatId', '==', chatData.chatId),
               orderBy('timestamp', 'desc'),
-              // limit(1)
             );
             const msgSnapshot = await getDocs(msgQuery);
             if (!msgSnapshot.empty) {
