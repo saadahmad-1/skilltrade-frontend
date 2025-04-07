@@ -75,6 +75,7 @@ export default function Dashboard() {
     })
       .then(res => res.json())
       .then(() => {
+        alert("Trade accepted successfully! You can start chatting with your match once they accept.");
         // Refresh trade and matches after accepting
         fetch(`${API_URL}/api/trade/user/${user.uid}`)
           .then(res => res.json())
@@ -103,9 +104,9 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col justify-center items-center px-4">
       <main className="w-full max-w-2xl">
         {showChat && chatUserId ? (
-          <ChatComponent 
-            matchUserId={chatUserId} 
-            matchUserName={chatUserName || "Trading Partner"} 
+          <ChatComponent
+            matchUserId={chatUserId}
+            matchUserName={chatUserName || "Trading Partner"}
             onBack={() => setShowChat(false)}
           />
         ) : (
@@ -116,7 +117,7 @@ export default function Dashboard() {
                   <HandshakeIcon className="w-16 h-16 text-blue-500" />
                 </div>
                 <h2 className="text-3xl font-bold mb-4">Your Current Trade</h2>
-                
+
                 <div className="grid grid-cols-2 gap-4 mt-6">
                   <div className="bg-gray-800 p-4 rounded-xl shadow-md">
                     <h3 className="text-xl font-semibold text-gray-300 mb-2">Have Skill</h3>
@@ -133,24 +134,30 @@ export default function Dashboard() {
                 {matches.length ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {matches.map(match => (
-                      match.acceptedBy === user?.uid && trade[0]?.acceptedBy ? (
-                        <div key={match._id} className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-                          {match.acceptedBy === user.uid && trade[0]?.acceptedBy && (
-                            <>
-                              <h2 className="text-2xl font-semibold mb-3 text-blue-400">{match?.userName}</h2>
-                              <p className="text-gray-300">Has: <span className="text-white">{match?.haveSkill?.name}</span></p>
-                              <p className="text-gray-300">Wants: <span className="text-white">{match?.wantSkill?.name}</span></p>  
-                              <button
-                                onClick={() => handleStartChat(match)}
-                                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full"
-                              >
-                                <MessageCircleIcon className="w-5 h-5" />
-                                <span>Continue to Chat</span>
-                              </button>
-                            </>
+                      <div key={match._id} className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                        <>
+                          <h2 className="text-2xl font-semibold mb-3 text-blue-400">{match?.userName}</h2>
+                          <p className="text-gray-300">Has: <span className="text-white">{match?.haveSkill?.name}</span></p>
+                          <p className="text-gray-300">Wants: <span className="text-white">{match?.wantSkill?.name}</span></p>
+                          {trade[0].acceptedBy && match?.acceptedBy ? (
+                            <button
+                              onClick={() => handleStartChat(match)}
+                              className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full"
+                            >
+                              <MessageCircleIcon className="w-5 h-5" />
+                              <span>Continue to Chat</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleAcceptMatch(match._id)}
+                              className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full"
+                            >
+                              <PlusCircleIcon className="w-5 h-5" />
+                              <span>Accept Trade</span>
+                            </button>
                           )}
-                        </div>
-                      ) : null
+                        </>
+                      </div>
                     ))}
                     <div className="mt-14">
                       <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full" onClick={() => router.push('/dashboard/chat')}>
