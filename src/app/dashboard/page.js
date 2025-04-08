@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [showChat, setShowChat] = useState(false);
   const [chatUserId, setChatUserId] = useState(null);
   const [chatUserName, setChatUserName] = useState(null);
+  const [tradeId, setTradeId] = useState(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -57,6 +58,7 @@ export default function Dashboard() {
             };
           }));
           setMatches(enriched);
+          setTradeId(enriched[0]._id);
         })
         .catch(err => console.error("Error fetching matches:", err));
     }
@@ -94,6 +96,24 @@ export default function Dashboard() {
     setShowChat(true);
   };
 
+  const handleCompleteTrade = () => {
+    fetch(`${API_URL}/api/trade/complete`, {
+      method: 'POST',
+      body: JSON.stringify({
+        tradeId: tradeId,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(res => res.json())
+      .then(() => {
+        alert("Trade completed successfully!");
+        router.push('/dashboard');
+      })
+      .catch(err => console.error("Error completing trade:", err));
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-black">
       <Spin size="large" />
@@ -111,7 +131,7 @@ export default function Dashboard() {
           />
         ) : (
           <div className="bg-gray-900 rounded-2xl p-8 w-full shadow-2xl border border-gray-800 transition-transform transform hover:scale-105">
-            {trade ? (
+            {trade && !trade[0].isCompleted && !matches[0].isCompleted ? (
               <div className="text-center">
                 <div className="mb-6 flex justify-center">
                   <HandshakeIcon className="w-16 h-16 text-blue-500" />
@@ -159,36 +179,43 @@ export default function Dashboard() {
                         </>
                       </div>
                     ))}
-                    <div className="mt-14">
+                    <div className="flex flex-col gap-4">
+                    <div className="">
                       <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full" onClick={() => router.push('/dashboard/chat')}>
                         Chat History
                       </button>
                     </div>
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-center text-gray-400">No matching trades found.</p>
-                    <div className="text-center">
-                      <div className="mb-6 flex justify-center">
-                        <BookOpenIcon className="w-16 h-16 text-green-500" />
-                      </div>
-                      <h2 className="text-3xl font-bold mb-4">Start Your Skill Exchange</h2>
-                      <p className="text-gray-400 mb-6">
-                        Connect with others, share your expertise, and learn something new. Every skill exchange is an opportunity for growth.
-                      </p>
-                      <button
-                        onClick={() => router.push('/dashboard/new-trade')}
-                        className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold flex items-center space-x-2 mx-auto transition-transform transform hover:scale-105 shadow-lg"
-                      >
-                        <PlusCircleIcon className="w-6 h-6" />
-                        <span>Create Your First Trade</span>
+                    <div className="">
+                      <button className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full" onClick={handleCompleteTrade}>
+                        Complete Trade
                       </button>
                     </div>
-                  </>
+                    </div>
+                  </div>
+                ) : (
+                  <></>
                 )}
               </div>
             ) : (
-              <></>
+              <>
+                <p className="text-center text-gray-400">No matching trades found.</p>
+                <div className="text-center">
+                  <div className="mb-6 flex justify-center">
+                    <BookOpenIcon className="w-16 h-16 text-green-500" />
+                  </div>
+                  <h2 className="text-3xl font-bold mb-4">Start A Skill Exchange</h2>
+                  <p className="text-gray-400 mb-6">
+                    Connect with others, share your expertise, and learn something new. Every skill exchange is an opportunity for growth.
+                  </p>
+                  <button
+                    onClick={() => router.push('/dashboard/new-trade')}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold flex items-center space-x-2 mx-auto transition-transform transform hover:scale-105 shadow-lg"
+                  >
+                    <PlusCircleIcon className="w-6 h-6" />
+                    <span>Create A Trade</span>
+                  </button>
+                </div>
+              </>
             )}
           </div>
         )}

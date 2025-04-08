@@ -63,16 +63,6 @@ const Navbar = () => {
                         <div className="absolute right-0 top-14 w-48 bg-neutral-800/95 backdrop-blur-sm shadow-lg rounded-xl overflow-hidden border border-neutral-700 transform transition-all duration-200 z-50">
                             <button
                                 onClick={() => {
-                                    router.push('/dashboard/new-trade');
-                                    setIsMenuOpen(false);
-                                }}
-                                className="flex items-center px-4 py-3 w-full hover:bg-indigo-500/20 text-white"
-                            >
-                                <PlusCircle className="mr-2" />
-                                New Trade
-                            </button>
-                            <button
-                                onClick={() => {
                                     handleLogout();
                                     setIsMenuOpen(false);
                                 }}
