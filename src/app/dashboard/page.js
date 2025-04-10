@@ -46,19 +46,19 @@ export default function Dashboard() {
         .then(async (data) => {
           const enriched = await Promise.all(data.map(async (match) => {
             const [haveSkill, wantSkill, userInfo] = await Promise.all([
-              fetch(`${API_URL}/api/skill/${match.haveSkill}`).then(res => res.json()),
-              fetch(`${API_URL}/api/skill/${match.wantSkill}`).then(res => res.json()),
-              fetch(`${API_URL}/api/user/${match.user}`).then(res => res.json())
+              fetch(`${API_URL}/api/skill/${match?.haveSkill}`).then(res => res.json()),
+              fetch(`${API_URL}/api/skill/${match?.wantSkill}`).then(res => res.json()),
+              fetch(`${API_URL}/api/user/${match?.user}`).then(res => res.json())
             ]);
             return {
               ...match,
               haveSkill,
               wantSkill,
-              userName: userInfo.fullName
+              userName: userInfo?.fullName
             };
           }));
           setMatches(enriched);
-          setTradeId(enriched[0]._id);
+          setTradeId(enriched[0]?._id);
         })
         .catch(err => console.error("Error fetching matches:", err));
     }
@@ -69,7 +69,7 @@ export default function Dashboard() {
       method: 'POST',
       body: JSON.stringify({
         tradeId: matchId,
-        userId: user.uid,
+        userId: user?.uid,
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -91,8 +91,8 @@ export default function Dashboard() {
   };
 
   const handleStartChat = (match) => {
-    setChatUserId(match.user);
-    setChatUserName(match.userName);
+    setChatUserId(match?.user);
+    setChatUserName(match?.userName);
     setShowChat(true);
   };
 
@@ -131,7 +131,7 @@ export default function Dashboard() {
           />
         ) : (
           <div className="bg-gray-900 rounded-2xl p-8 w-full shadow-2xl border border-gray-800 transition-transform transform hover:scale-105">
-            {trade && !trade[0].isCompleted && !matches[0].isCompleted ? (
+            {trade && !trade[0]?.isCompleted && !matches[0]?.isCompleted ? (
               <div className="text-center">
                 <div className="mb-6 flex justify-center">
                   <HandshakeIcon className="w-16 h-16 text-blue-500" />
@@ -154,12 +154,12 @@ export default function Dashboard() {
                 {matches.length ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {matches.map(match => (
-                      <div key={match._id} className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                      <div key={match?._id} className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
                         <>
                           <h2 className="text-2xl font-semibold mb-3 text-blue-400">{match?.userName}</h2>
                           <p className="text-gray-300">Has: <span className="text-white">{match?.haveSkill?.name}</span></p>
                           <p className="text-gray-300">Wants: <span className="text-white">{match?.wantSkill?.name}</span></p>
-                          {trade[0].acceptedBy && match?.acceptedBy ? (
+                          {trade[0]?.acceptedBy && match?.acceptedBy ? (
                             <button
                               onClick={() => handleStartChat(match)}
                               className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full"
@@ -169,7 +169,7 @@ export default function Dashboard() {
                             </button>
                           ) : (
                             <button
-                              onClick={() => handleAcceptMatch(match._id)}
+                              onClick={() => handleAcceptMatch(match?._id)}
                               className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full"
                             >
                               <PlusCircleIcon className="w-5 h-5" />
