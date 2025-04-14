@@ -131,7 +131,7 @@ export default function Dashboard() {
           />
         ) : (
           <div className="bg-gray-900 rounded-2xl p-8 w-full shadow-2xl border border-gray-800 transition-transform transform hover:scale-105">
-            {trade && !trade[0]?.isCompleted && !matches[0]?.isCompleted ? (
+            {trade==[] && !trade[0]?.isCompleted && !matches[0]?.isCompleted ? (
               <div className="text-center">
                 <div className="mb-6 flex justify-center">
                   <HandshakeIcon className="w-16 h-16 text-blue-500" />
