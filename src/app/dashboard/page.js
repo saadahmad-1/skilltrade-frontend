@@ -215,6 +215,11 @@ export default function Dashboard() {
                     <span>Create A Trade</span>
                   </button>
                 </div>
+                <div className="text-center">
+                  <button className="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full flex items-center justify-center space-x-2 mt-4 w-full" onClick={() => router.push('/dashboard/completed-trades')}>
+                    View Completed Trades
+                  </button>
+                </div>
               </>
             )}
           </div>
