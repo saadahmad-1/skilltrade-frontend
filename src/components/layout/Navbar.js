@@ -40,11 +40,6 @@ const Navbar = () => {
                         Skill<span className="text-indigo-500">Trade</span>
                     </Link>
                 </div>
-                <div>
-                    <Link href="/admin" className="text-white hover:text-indigo-500 transition-colors">
-                        Admin
-                    </Link>
-                </div>
                 <div className="relative">
                     <button
                         onClick={toggleMenu}
